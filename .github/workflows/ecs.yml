@@ -22,7 +22,7 @@ jobs:
         id: render-web-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: task_definition.json
+          task-definition: task-definition.json
           container-name: ci-example-container
           image: 763104351884.dkr.ecr.us-east-1.amazonaws.com/mxnet-training:1.6.0-cpu-py27-ubuntu16.04
       - name: Deploy to Amazon ECS service
