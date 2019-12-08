@@ -12,6 +12,12 @@ jobs:
     runs-on: ubuntu-18.04
 
     steps:
+      - name: List the contents of the directory
+        run: ls
+      - name: Show the path of the current directory
+        run: pwd
+      - name: Find the path to all the task definition files
+        run: find . -name task-definition.json
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
