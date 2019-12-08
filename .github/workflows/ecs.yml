@@ -2,7 +2,7 @@ name: AWS ECS for nightly build
 
 on:
   schedule:
-    - cron:  '45 * * * *'
+    - cron:  '0 * * * *'
 
   check_suite:
     types: [rerequested]
