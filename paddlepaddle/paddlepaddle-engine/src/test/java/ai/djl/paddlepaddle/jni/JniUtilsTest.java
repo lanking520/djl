@@ -12,9 +12,19 @@
  */
 package ai.djl.paddlepaddle.jni;
 
+import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.paddlepaddle.engine.PaddlePredictor;
+import ai.djl.paddlepaddle.engine.PpNDArray;
+import ai.djl.paddlepaddle.engine.PpSymbolBlock;
+import ai.djl.repository.zoo.Criteria;
+import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.repository.zoo.ModelZoo;
+import ai.djl.repository.zoo.ZooModel;
+import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -32,6 +42,36 @@ public class JniUtilsTest {
             expected = new float[] {1, 3, 2};
             array = manager.create(expected);
             Assert.assertEquals(array.toFloatArray(), expected);
+        }
+    }
+
+    @Test
+    void testMemory()
+            throws ModelNotFoundException, MalformedModelException, IOException,
+                    InterruptedException {
+        Criteria<NDList, NDList> criteria =
+                Criteria.builder()
+                        .setTypes(NDList.class, NDList.class)
+                        .optModelUrls(
+                                "https://resources.djl.ai/test-models/paddleOCR/mobile/det_db.zip")
+                        .build();
+
+        ZooModel<NDList, NDList> model = ModelZoo.loadModel(criteria);
+        PpSymbolBlock block = ((PpSymbolBlock) model.getBlock());
+        PaddlePredictor pred = block.getPredictor();
+        String[] inputNames = JniUtils.getInputNames(pred);
+        try (NDManager manager = NDManager.newBaseManager()) {
+            for (int i = 0; i < 10000; i++) {
+                PpNDArray[] inputs =
+                        new PpNDArray[] {(PpNDArray) manager.ones(new Shape(1, 3, 512, 512))};
+                PpNDArray[] out = JniUtils.predictorForward(pred, inputs, inputNames);
+                for (PpNDArray arr : out) {
+                    arr.close();
+                }
+                for (PpNDArray arr : inputs) {
+                    arr.close();
+                }
+            }
         }
     }
 }

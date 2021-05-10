@@ -96,6 +96,10 @@ public class PpSymbolBlock extends AbstractSymbolBlock {
         return list;
     }
 
+    public PaddlePredictor getPredictor() {
+        return predictor;
+    }
+
     /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(Shape[] inputShapes) {
