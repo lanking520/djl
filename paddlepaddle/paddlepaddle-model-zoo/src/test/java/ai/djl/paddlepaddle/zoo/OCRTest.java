@@ -60,6 +60,21 @@ public class OCRTest {
         }
     }
 
+    @Test
+    public void testMemory() throws ModelNotFoundException, MalformedModelException, IOException, TranslateException {
+        Map<String, String> filter = new ConcurrentHashMap<>();
+        filter.put("flavor", "mobile");
+        String url = "https://resources.djl.ai/images/flight_ticket.jpg";
+        try (ZooModel<Image, DetectedObjects> model =
+                     PpModelZoo.WORD_DETECTION.loadModel(filter, null, new ProgressBar());
+             Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
+            for (int i = 0; i < 10000; i++) {
+                Image img = ImageFactory.getInstance().fromUrl(url);
+                DetectedObjects result = predictor.predict(img);
+            }
+        }
+    }
+
     private static DetectedObjects detectWords(Image img)
             throws ModelException, IOException, TranslateException {
         Map<String, String> filter = new ConcurrentHashMap<>();
